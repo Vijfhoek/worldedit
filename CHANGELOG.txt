@@ -1,3 +1,350 @@
+5.6.1
+- Added support for Minecraft 1.7.5 on Bukkit.
+- Added //flora command to place flora over grass.
+- Fixed //forest accepting the wrong arguments.
+
+5.6
+- Added //forest that generates a forest in a selection.
+- Added -s flag to //paste to select the pasted area.
+- Added //line command and EditSession method.
+- Added //curve.
+- Added 1.7 blocks, biomes, trees, and items.
+- Added a "hand" pseudo block type that uses the currently selected block.
+- Added a "pos1" pseudo block type, which uses the block type from the 
+  "primary position".
+- Added a //generatebiome command, which uses formulae to generate free-form 
+  biomes.
+- Added a check for both superperms and PEX directly to support older versions 
+  of PEX with inGroup.
+- Added a SolidBlockMask (#solid).
+- Added an item->block mapping for LocalPlayer.getBlockInHand().
+- Added colors for stained clay and carpet data values.
+- Added configuration option to set the default for the /up and /ceil commands.
+- Added data value mappings for certain blocks and made all other block types 
+  wildcard matches.
+- Added fly mode support for /up and /ceil,
+- Added hollow lines.
+- Added Line thickness support.
+- Added new log/leaves to floating tree remover tool.
+- Added non-cuboid support for //walls and //outline.
+- Added query{,Abs,Rel}(x,y,z,typevar,datavar) to the expression parser.
+- Added support for rotating hay blocks like logs.
+- Added usage of non-existent variables in all LValue expressions.
+- Changed /up and /ceil command to use glass block by default. Flight can be 
+  done via -f flag now.
+- Removed the /fill command as an alias of /material (which sets the brush
+  material).
+- Fixed //deform not doing anything at all.
+- Fixed //walls on non-cuboid regions so that they no longer introduces gaps 
+  in walls beyond 45 degrees.
+- Fixed /ascend and /descend to use the height of blocks properly.
+- Fixed /green command so that it no longer affects permadirt and podzol.
+- Fixed bed rotation.
+- Fixed door rotation and disabled door y flipping.
+- Fixed forest generator to make trees under snow tiles.
+- Fixed head rotation.
+- Fixed lever rotation.
+- Fixed not flipping the center plane blocks.
+- Fixed snapshot restore now so it now obeys masks again.
+- Fixed some attachments that would result in items being dropped.
+- Fixed the query functions not comparing data values at all for their 
+  return values.
+- Fixed improper block probability patterns (i.e. 20%,10%grass) causing an error.
+- Fixed /we help not finding commands if uppercase names are used.
+
+5.5.8
+- Update for Minecraft 1.6.2 and 1.6.4
+- Made generation commands respect max-radius config setting
+- Fixed use-inventory overrides not being applied in certain cases
+- Made //move work with non-cuboid regions
+- Added a convex polyhedron selector
+- Made clipboard work with non-cuboid regions
+
+5.5.7
+- Update for Minecraft 1.6.1
+- Fixed a bug with GroupManager detection.
+- Added a coordinate argument for //chunk
+- Allowed cylinder selector to be changed to a rough polygon.
+- Fix a typo
+
+5.5.6
+- Updated for Minecraft 1.5.2.
+- Pistons can now be rotated with cycler tool.
+- Hoppers no longer lose orientation.
+- Using //setbiome now respects global biome masks.
+- Fixed an issue with certain blocks that had multiple
+  possible TileEntities. (mods only)
+- Added console support for /remove command. (removes from ALL worlds).
+
+5.5.5
+- Updated for Minecraft 1.5.1.
+
+5.5.4
+- Fixed a bug caused by MC 1.5 where block updates were not being sent.
+
+5.5.3
+- Fixed the error caused by Bukkit's change of the TNT minecart API.
+- Added names for new items.
+
+5.5.2
+- Update to MineCraft 1.5.
+- Fixed //flip going the wrong direction in certain cases.
+- Fixed 4096 block id support in schematics and snapshots.
+- Fixed max-blocks-changed not being used.
+
+5.5.1
+- Added support for multiple versions of Minecraft. A folder will be created in
+    plugins/WorldEdit/nmsblocks which contains different class files which will be
+    dynamically checked for compatibility with the current minecraft version.
+- Added -d flags to //count and //distr, which allow separating blocks by data values.
+- Added a butcher brush (//brush butcher) which works like the command in a brush. The flags
+    for the command can be passed an an argument for the brush.
+- Fixed an issue with use-inventory where container blocks will spill when being removed.
+- Added a setting to allow creative mode players to override use-inventory.
+
+5.5
+- Added failsafe for when Craftbukkit packaging switches versions. Note that using
+    mismatched WorldEdit and CraftBukkit version will cause data to be lost when
+    copy/pasting or loading certain blocks with advanced data.
+- Updated cardinal directions to match newer Notchian values.
+    Using command that take a direction will now use these directions.
+- Add support for setting skull blocks. Syntax is skull:data|MobType|rotation. MobType
+    can also be a player name.
+- Removed old permissions for jumpto and thru. You must now use jumpto.command
+    or jumpto.tool respectively (or thru.).
+- Added -c flag to //size and //distr. Operates on the clipboard instead of
+    current selection.
+- Added support for rotating wooden logs.
+- Add butcher-radius.maximum and butcher-radius.default to limits section of config.
+- Added -b flag to //butcher to specify ambient mobs (currently only bats)
+- Added -d and -n flags for //schematic list command. Sorts by date by newest/oldest.
+- Added a configuration option to allow symbolic links (for backups, schematics, etc)
+- Improved accuracy of command logging, as well as logging to file correctly. The
+    worldedit.log file (by default) should now be useful.
+- Fixed //snow snowing on some blocks it shouldn't (like stairs)
+- For developers: Added a LocalPlayer argument to the constructors for EditSession in
+    the factory. Also added @NestedCommand(executeBody=true/false) so that base commands
+    can be executed if no subcommands are passed.
+
+5.4.5:
+- Fixed minor check issue with //center.
+
+5.4.4:
+- Added official support for Minecraft 1.4.
+- Added support for 4096 ID blocks (theoretically) in snapshots.
+- Fixed issue with block IDs being returned negative in snapshots.
+- Fixed //limit being overridden each time a LocalSession is fetched.
+- Added EditSessionFactory class for developers.
+
+Thank you to ammaraskar for his contribution.
+
+5.4.3:
+- Added block data support to BlockMask.
+- Added //center command to set blocks at the center point of a selection.
+- Correctly update session permissions on each operation.
+- Fix errors when trying to set invalid blocks.
+- Fix chests & similar not having their extended (tile entity) data being correctly copied back when the block currently in the location has the same type and data.
+- Added emerald as an alias for the emerald block.
+- Added string as an alias for the tripwire block (wire, not hook).
+
+Thanks for the contributions from aumgn
+
+5.4.2:
+- Fixed //gen not having a proper minimum parameter count of 2.
+- Added //re and //rep as aliases for //replace, and aliases /asc(end),
+    /desc(end), and /j(umpto).
+- Fixed schematics not properly loading chests with the new code, meaning that
+    enchantments and other properties were not always properly loaded.
+- Fixed -1 not being a valid data value in Block, which broke //replace.
+- Fixed snapshots to support custom blocks/tile entity data.
+- Updated bundled README.html to be current.
+
+5.4.1:
+- Fixed lingering 256 block ID restriction preventing block IDs up to 4095.
+- Fixed certain tile entity blocks not being set correctly.
+- Fixed schematic loading code not properly handling the AddBlocks section.
+
+5.4:
+- Added support for Minecraft 1.3.
+- Added improved, but experimental, support for custom blocks added by
+    mods, and added by future Minecraft versions.
+- Added help to //schematic.
+- Added WECUI handshake option.
+- Added improved //schem list output.
+- Added configuration options for polygonal region limits.
+- Added -r to //schematic to ignore format checks.
+- Added //generate -c, which offsets the input coordinates from the selection
+    center.
+- Added support for 4096 ID blocks.
+- Added support for data values > 127 in schematic files.
+- Added [g]closest(x,y,z,index,count,stride) to the expression parser.
+- Added an all parameter, and a message indicating its radius, to /butcher.
+- Added new "WorldEdit Foundation" classes to eventually replace the current
+    block/world/etc. classes (for developers!).
+- Fixed a number of bugs in schematic handling that created errors.
+- Fixed issues with biome processing.
+- Fixed insufficient biome type checking.
+- Fixed the error for missing schematics, making it easier to understand.
+- Fixed snapshots not properly loading .mcr files.
+- Fixed //chunk switching from //sel extend to //sel cuboid.
+- Removed chat-based WECUI protocol (now replaced with packet 250).
+
+Thank you for the contributions from Ammar Askar (ammaraskar), aumgn,
+Jim Nordbø (Silentspy), snaxson, Socolin, and Zhuowei Zhang (zhuowei).
+
+5.3:
+- Made #region mask keep the region selected when the pask was added, and
+    added #dregion mask that always uses the player's current 
+selection
+- Allow inverted and under/overlay masks to affect masks, making them more
+    flexible. This allows for things like /gmask !$biome and 
+/gmask >>>#region
+- Added basic entity handling with copy and paste. Paintings do not currently
+    respawn properly, entity pastes cannot be undone yet, and 
+schematics do not yet store entities
+- Added getChunkCubes() to Region to get 16^3 chunks a region overlaps with
+- Cleaned up ContainerBlock inventory reading from NBT.
+- Added a command to list schematics and the abilitiy to autodetect schematic
+    format when loading schematics
+- Added support for multiple schematic formats
+- Corrected flag checks for biome commands
+- Added allFlags setting to Command to prevent it from restricting allowed
+    flags (for dveleopers!)
+- Make sure all WorldEdit files are in the plugins/WorldEdit folder
+- Added initial support for plugin channels with WECUI
+- Remove error-prone redundancy in Polygonal2D min/max management
+- Updated for SpoutVanilla changes
+- Added Falling sand/gravel entities to /remove command
+- Added support for new tree types to TreeGenerator and make adding more tree 
+    types later easier
+- Updated for changes to SpoutAPI
+- Fixed FloatingTreeRemover (/tool deltree) to work correctly with jungle trees
+- Fix bPermissions instanlled check
+- Add a -f (friendly) flag to butcher which applies -a, -n, -p, and -g, and a
+    -g flag which allows butchering of iron and snow golems
+- Add FlatRegion interface and an associated iterator (for developers!)
+- Fix a NPE with brush using a global mask and no brush mask
+- Fixed //shift not updating polygonal regions properly.
+- Add support for expand with reverse dir for Cylinder & Ellipsoid
+- Make inset/outset use varargs contract/expand, so they can be used with
+    cylinders and ellipses.
+- Add positive() to Vector and Vector2D
+- In WorldGuard, teleport/spawn location yaw/pitch should now work.
+- Register command permissions, integrate with the Bukkit help API 
+- Allow annotation-free registering of commands with other plugins
+    (for developers!)
+- Added default radius setting for butcher and added permissions for killing
+    pets, npcs, and non hostile animals.
+- Added support for new Anvil saving format, fixed old chunk saving format.
+- Clean up some stray 128 values and update the fallbacks to 256
+- Add support for 1.2.4 and newer
+- Updated for new 1.2 and 1.2.4 blocks, items, and mobs
+- Fix Dispensers, Furnaces and remove redundant casts.
+- Fix restoring enchantments from snapshots/schematics.
+- Made tree planter tool try 10 times to make the tree before giving up.
+
+Thanks to Nidan, aumgn, Jadedwolf, wizjany, SpectralEdge, md_5, and desht for 
+their contributions
+
+
+5.2:
+- Made BlockBag use WorldVectors for add(Single)SourcePosition
+- Fixed north face not being set with non-singleblockpatterns.
+- Moved the block data check to LocalWorld, adding preliminary support for
+    custom blocks.
+- Lookup by id if the string passed to Block/ItemType.lookup() is an integer
+- Fixed issues with //replace.
+- Factored lookup code from BlockType and ItemType into a method in StringUtil.
+- BaseBlock changes
+- Properly escape cuipattern
+- Fix handling of empty strings passed to Block/ItemType
+- Improved formatting and performance of YAMLProcessor when no comments are
+    present.
+- Added bPermissions support
+- Update for new events system
+- Fixed /scriptname.js and no-double-slash settings not working
+- Corrected usage message for maze.js
+- Fixed mimimum height check for cylinder generation
+- Get the items to be dropped for a block break from Bukkit
+
+5.1.1:
+- Fixed some compatibility issues with SpoutPlugin
+- Readded Permissions 2/3 support
+- Fixed an issue with CylinderRegion
+
+5.1:
+- Added a //help command (alias /we help).
+- Fixed a NullPointerException in conjunction with CraftBook.
+- Added support for console commands to WorldEditPlugin.
+- Made /butcher, /searchitem (and /search) and /worldedit (and /we) work on the
+    console.
+- Fixed //stack -s (again).
+- Added a thickness parameter to //hollow.
+- Added a block/pattern parameter to //hollow.
+- Added a -l flag to /butcher, which spawns fake lightning on all killed
+    entities.
+- Added support for dynamic command registration.
+- //sel poly now keeps the previous selection, converting its outline into a
+    polygon if necessary.
+- Fixed //sel selection clearing not being dispatched to CUI.
+- Improve zip file recognition.
+- Added WECUI protocol version support. Eventually, this will disable WECUI
+    until the user updates, but not yet.
+- Added //desel and //deselect as aliases for //sel
+- Added a gravity brush.
+- Added support for ellipsoid and sphere selections.
+- Add cuiVersion to LocalSession and set it via incoming CUI event Refactor 
+    region selectors to handle legacy versions a bit better. Because chat
+    doesn't allow the section sign to be sent, I have to send non-color codes. Meh. closes #158
+- Some region selection fixes
+- Removed redundant line from README.md.
+- Add a cylindrical region selector.
+- Added initial SpoutAPI compatibility
+- Allow copying item stacks with damage of > Byte.MAX_VALUE. Closes #972
+- Improved output of YAMLProcessor and added support for root-level comments. 
+    (for developers!)
+- Removed support for Permissions2/3
+- Performance improvements
+- 1.1 compatibility
+Thanks to everyone for their contributions:
+rjwboys, yetanotherx, and GiCodeWarrior
+
+5.0:
+- Added a //g[en[erate]] command that can generate a shape given a formula
+- Added a //deform command that deforms the current selection given a formula
+- Added a //hollow command, which hollows out the object contained in the selection.
+
+- Added /snapshot sel, which preselects a snapshot for future operations
+- Added //sel extend, which activates cuboid selector where you can extend 
+    selections by right-clicking.
+- Added -a and -n flags to //butcher to kill animals and NPCs, respectively
+- Added support for stretched cylinders to //cyl and //hcyl (use //cyl x,z)
+- Added sound and particle effects for the super pickaxe
+- Added l[eft], r[ight], b[ack] and f[orward] to the commands that take a direction.
+- Added an expression parser (for developers!)
+- Added a YAML library (for developers!)
+- Added extended help to commands manager (for developers!)
+
+- Support for the new blocks/items/mobs that were added with Minecraft 1.0
+- Support for non-128 world heights
+- Block queues are now flushed based on attachment to other blocks. This should
+    fix doors popping out.
+- Made blockbag (take blocks from inventory) system more consistent.
+- Made some commands' syntax error messages more elaborate and useful
+- Made /green break on liquids.
+- Improved interaction with permission plugins
+- Improved negated node support for Bukkit's permissions system
+- Changed the WEPIF interface (for developers!)
+
+- Fixed data value handling for fire, chest, reed and jukebox
+- Fixed config file generation on windows
+- Fixed some navigation wand (compass) quirks
+- Fixed the tree remover tool for large forests
+- Fixed //stack -s to actually shift the selection to the end of the stack
+- Bug fixes
+Thanks to everyone for their contributions:
+KenanY, Megalin, wizjany and ZachBora
+
 4.7:
 - Added support for all the new items and blocks
 - Added multiworld permissions support to WEPIF

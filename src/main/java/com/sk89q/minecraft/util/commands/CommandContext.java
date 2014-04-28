@@ -1,20 +1,21 @@
-// $Id$
 /*
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.minecraft.util.commands;
 
@@ -64,7 +65,7 @@ public class CommandContext {
         List<String> argList = new ArrayList<String>(args.length);
         for (int i = 1; i < args.length; ++i) {
             String arg = args[i];
-            if (arg.isEmpty()) {
+            if (arg.length() == 0) {
                 continue;
             }
 
@@ -79,7 +80,7 @@ public class CommandContext {
                 int endIndex;
                 for (endIndex = i; endIndex < args.length; ++endIndex) {
                     final String arg2 = args[endIndex];
-                    if (arg2.charAt(arg2.length() - 1) == quotedChar) {
+                    if (arg2.charAt(arg2.length() - 1) == quotedChar && arg2.length() > 1) {
                         if (endIndex != i) build.append(' ');
                         build.append(arg2.substring(endIndex == i ? 1 : 0, arg2.length() - 1));
                         break;
@@ -93,6 +94,11 @@ public class CommandContext {
                 if (endIndex < args.length) {
                     arg = build.toString();
                     i = endIndex;
+                }
+
+                // In case there is an empty quoted string
+                if (arg.length() == 0) {
+                    continue;
                 }
                 // else raise exception about hanging quotes?
             }
@@ -110,7 +116,7 @@ public class CommandContext {
 
             // Not a flag?
             if (arg.charAt(0) != '-' || arg.length() == 1 || !arg.matches("^-[a-zA-Z]+$")) {
-                originalArgIndices.add(argIndexList.get(nextArg-1));
+                originalArgIndices.add(argIndexList.get(nextArg - 1));
                 parsedArgs.add(arg);
                 continue;
             }
@@ -134,13 +140,12 @@ public class CommandContext {
                     }
 
                     if (nextArg >= argList.size()) {
-                        throw new CommandException("No value specified for the '-"+flagName+"' flag.");
+                        throw new CommandException("No value specified for the '-" + flagName + "' flag.");
                     }
 
                     // If it is a value flag, read another argument and add it
                     this.valueFlags.put(flagName, argList.get(nextArg++));
-                }
-                else {
+                } else {
                     booleanFlags.add(flagName);
                 }
             }
@@ -152,7 +157,7 @@ public class CommandContext {
     }
 
     public boolean matches(String command) {
-        return command.equalsIgnoreCase(command);
+        return this.command.equalsIgnoreCase(command);
     }
 
     public String getString(int index) {
@@ -197,6 +202,18 @@ public class CommandContext {
     public String[] getPaddedSlice(int index, int padding) {
         String[] slice = new String[originalArgs.length - index + padding];
         System.arraycopy(originalArgs, index, slice, padding, originalArgs.length - index);
+        return slice;
+    }
+
+    public String[] getParsedSlice(int index) {
+        String[] slice = new String[parsedArgs.size() - index];
+        System.arraycopy(parsedArgs.toArray(new String[parsedArgs.size()]), index, slice, 0, parsedArgs.size() - index);
+        return slice;
+    }
+
+    public String[] getParsedPaddedSlice(int index, int padding) {
+        String[] slice = new String[parsedArgs.size() - index + padding];
+        System.arraycopy(parsedArgs.toArray(new String[parsedArgs.size()]), index, slice, padding, parsedArgs.size() - index);
         return slice;
     }
 

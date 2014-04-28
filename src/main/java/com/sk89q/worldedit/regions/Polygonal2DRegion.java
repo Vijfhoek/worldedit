@@ -1,100 +1,126 @@
-// $Id$
 /*
- * WorldEdit
- * Copyright (C) 2010, 2011 sk89q <http://www.sk89q.com>
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldedit.regions;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import com.sk89q.worldedit.BlockVector;
 import com.sk89q.worldedit.BlockVector2D;
+import com.sk89q.worldedit.LocalWorld;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.Vector2D;
-import com.sk89q.worldedit.data.ChunkStore;
+import com.sk89q.worldedit.regions.iterator.FlatRegion3DIterator;
+import com.sk89q.worldedit.regions.iterator.FlatRegionIterator;
+import com.sk89q.worldedit.world.World;
 
 /**
  * Represents a 2D polygonal region.
  *
  * @author sk89q
  */
-public class Polygonal2DRegion implements Region {
-    protected List<BlockVector2D> points;
-    protected BlockVector min;
-    protected BlockVector max;
-    protected int minY;
-    protected int maxY;
-    protected boolean hasY = false;
-    
+public class Polygonal2DRegion extends AbstractRegion implements FlatRegion {
+    private List<BlockVector2D> points;
+    private Vector2D min;
+    private Vector2D max;
+    private int minY;
+    private int maxY;
+    private boolean hasY = false;
+
     /**
-     * Construct the region.
+     * Construct the region
      */
     public Polygonal2DRegion() {
-        points = new ArrayList<BlockVector2D>();
-        minY = 0;
-        maxY = 0;
-        hasY = false;
-        recalculate();
+        this((World) null);
     }
-    
+
+    @Deprecated
+    public Polygonal2DRegion(LocalWorld world) {
+        this((World) world);
+    }
+
     /**
      * Construct the region.
-     * 
+     *
+     * @param world
+     */
+    public Polygonal2DRegion(World world) {
+        this(world, Collections.<BlockVector2D>emptyList(), 0, 0);
+        hasY = false;
+    }
+
+    @Deprecated
+    public Polygonal2DRegion(LocalWorld world, List<BlockVector2D> points, int minY, int maxY) {
+        this((World) world, points, minY, maxY);
+    }
+
+    /**
+     * Construct the region.
+     *
+     * @param world
      * @param points
      * @param minY
      * @param maxY
      */
-    public Polygonal2DRegion(List<BlockVector2D> points, int minY, int maxY) {
-        this.points = points;
+    public Polygonal2DRegion(World world, List<BlockVector2D> points, int minY, int maxY) {
+        super(world);
+        this.points = new ArrayList<BlockVector2D>(points);
         this.minY = minY;
         this.maxY = maxY;
         hasY = true;
         recalculate();
     }
-    
+
+    public Polygonal2DRegion(Polygonal2DRegion region) {
+        this(region.world, region.points, region.minY, region.maxY);
+        hasY = region.hasY;
+    }
+
     /**
      * Get the list of points.
-     * 
+     *
      * @return
      */
     public List<BlockVector2D> getPoints() {
         return Collections.unmodifiableList(points);
     }
-    
+
     /**
      * Recalculate the bounding box of this polygonal region. This should be
      * called after points have been changed.
      */
     protected void recalculate() {
         if (points.size() == 0) {
-            min = new BlockVector(0, 0, 0);
-            max = new BlockVector(0, 0, 0);
+            min = new Vector2D(0, 0);
+            minY = 0;
+            max = new Vector2D(0, 0);
+            maxY = 0;
             return;
         }
-        
+
         int minX = points.get(0).getBlockX();
         int minZ = points.get(0).getBlockZ();
         int maxX = points.get(0).getBlockX();
         int maxZ = points.get(0).getBlockZ();
-        
+
         for (BlockVector2D v : points) {
             int x = v.getBlockX();
             int z = v.getBlockZ();
@@ -109,43 +135,60 @@ public class Polygonal2DRegion implements Region {
         minY = Math.min(oldMinY, oldMaxY);
         maxY = Math.max(oldMinY, oldMaxY);
 
-        min = new BlockVector(minX, minY, minZ);
-        max = new BlockVector(maxX, maxY, maxZ);
+        minY = Math.min(Math.max(0, minY), world == null ? 255 : world.getMaxY());
+        maxY = Math.min(Math.max(0, maxY), world == null ? 255 : world.getMaxY());
+
+        min = new Vector2D(minX, minZ);
+        max = new Vector2D(maxX, maxZ);
     }
-    
+
     /**
      * Add a point to the list.
-     * 
+     *
      * @param pt
      */
     public void addPoint(Vector2D pt) {
         points.add(pt.toBlockVector2D());
         recalculate();
     }
-    
+
     /**
      * Add a point to the list.
-     * 
+     *
      * @param pt
      */
     public void addPoint(BlockVector2D pt) {
         points.add(pt);
         recalculate();
     }
-    
+
     /**
      * Add a point to the list.
-     * 
+     *
      * @param pt
      */
     public void addPoint(Vector pt) {
         points.add(new BlockVector2D(pt.getBlockX(), pt.getBlockZ()));
         recalculate();
     }
-    
+
+    /**
+     * Get the minimum Y.
+     *
+     * @return min y
+     */
+    public int getMinimumY() {
+        return minY;
+    }
+
+    @Deprecated
+    public int getMininumY() {
+        return minY;
+    }
+
     /**
      * Set the minimum Y.
-     * 
+     *
      * @param y
      */
     public void setMinimumY(int y) {
@@ -153,10 +196,19 @@ public class Polygonal2DRegion implements Region {
         minY = y;
         recalculate();
     }
-    
+
     /**
-     * Se the maximum Y.
-     * 
+     * Get the maximum Y.
+     *
+     * @return max y
+     */
+    public int getMaximumY() {
+        return maxY;
+    }
+
+    /**
+     * Set the maximum Y.
+     *
      * @param y
      */
     public void setMaximumY(int y) {
@@ -167,25 +219,25 @@ public class Polygonal2DRegion implements Region {
 
     /**
      * Get the lower point of a region.
-     * 
+     *
      * @return min. point
      */
     public Vector getMinimumPoint() {
-        return min;
+        return min.toVector(minY);
     }
 
     /**
      * Get the upper point of a region.
-     * 
+     *
      * @return max. point
      */
     public Vector getMaximumPoint() {
-        return max;
+        return max.toVector(maxY);
     }
 
     /**
      * Get the number of blocks in the region.
-     * 
+     *
      * @return number of blocks
      */
     public int getArea() {
@@ -198,7 +250,7 @@ public class Polygonal2DRegion implements Region {
             j = i;
         }
 
-        return (int)Math.floor(Math.abs(area * 0.5) 
+        return (int) Math.floor(Math.abs(area * 0.5)
                 * (maxY - minY + 1));
     }
 
@@ -208,7 +260,7 @@ public class Polygonal2DRegion implements Region {
      * @return width
      */
     public int getWidth() {
-        return max.getBlockX() - min.getBlockX();
+        return max.getBlockX() - min.getBlockX() + 1;
     }
 
     /**
@@ -217,7 +269,7 @@ public class Polygonal2DRegion implements Region {
      * @return height
      */
     public int getHeight() {
-        return max.getBlockY() - min.getBlockY();
+        return maxY - minY + 1;
     }
 
     /**
@@ -226,24 +278,28 @@ public class Polygonal2DRegion implements Region {
      * @return length
      */
     public int getLength() {
-        return max.getBlockZ() - min.getBlockZ();
+        return max.getBlockZ() - min.getBlockZ() + 1;
     }
 
     /**
      * Expand the region.
      *
-     * @param change
+     * @param changes
      */
-    public void expand(Vector change) throws RegionOperationException {
-        if (change.getBlockX() != 0 || change.getBlockZ() != 0) {
-            throw new RegionOperationException("Polygons can only be expanded vertically.");
+    public void expand(Vector... changes) throws RegionOperationException {
+        for (Vector change : changes) {
+            if (change.getBlockX() != 0 || change.getBlockZ() != 0) {
+                throw new RegionOperationException("Polygons can only be expanded vertically.");
+            }
         }
-        
-        int changeY = change.getBlockY();
-        if (changeY > 0) {
-            maxY += changeY;
-        } else {
-            minY += changeY;
+
+        for (Vector change : changes) {
+            int changeY = change.getBlockY();
+            if (changeY > 0) {
+                maxY += changeY;
+            } else {
+                minY += changeY;
+            }
         }
         recalculate();
     }
@@ -251,19 +307,40 @@ public class Polygonal2DRegion implements Region {
     /**
      * Contract the region.
      *
-     * @param change
+     * @param changes
      */
-    public void contract(Vector change) throws RegionOperationException {
-        if (change.getBlockX() != 0 || change.getBlockZ() != 0) {
-            throw new RegionOperationException("Polygons can only be contracted vertically.");
+    public void contract(Vector... changes) throws RegionOperationException {
+        for (Vector change : changes) {
+            if (change.getBlockX() != 0 || change.getBlockZ() != 0) {
+                throw new RegionOperationException("Polygons can only be contracted vertically.");
+            }
         }
-        
-        int changeY = change.getBlockY();
-        if (changeY > 0) {
-            minY += changeY;
-        } else {
-            maxY += changeY;
+
+        for (Vector change : changes) {
+            int changeY = change.getBlockY();
+            if (changeY > 0) {
+                minY += changeY;
+            } else {
+                maxY += changeY;
+            }
         }
+        recalculate();
+    }
+
+    @Override
+    public void shift(Vector change) throws RegionOperationException {
+        final double changeX = change.getX();
+        final double changeY = change.getY();
+        final double changeZ = change.getZ();
+
+        for (int i = 0; i < points.size(); ++i) {
+            BlockVector2D point = points.get(i);
+            points.set(i, new BlockVector2D(point.getX() + changeX, point.getZ() + changeZ));
+        }
+
+        minY += changeY;
+        maxY += changeY;
+
         recalculate();
     }
 
@@ -276,12 +353,12 @@ public class Polygonal2DRegion implements Region {
 
     /**
      * Checks to see if a point is inside a region.
-     * 
-     * @param points 
-     * @param minY 
-     * @param maxY 
-     * @param pt 
-     * @return 
+     *
+     * @param points
+     * @param minY
+     * @param maxY
+     * @param pt
+     * @return
      */
     public static boolean contains(List<BlockVector2D> points, int minY,
             int maxY, Vector pt) {
@@ -291,11 +368,11 @@ public class Polygonal2DRegion implements Region {
         int targetX = pt.getBlockX(); //wide
         int targetY = pt.getBlockY(); //height
         int targetZ = pt.getBlockZ(); //depth
-        
+
         if (targetY < minY || targetY > maxY) {
             return false;
         }
-        
+
         boolean inside = false;
         int npoints = points.size();
         int xNew, zNew;
@@ -328,7 +405,7 @@ public class Polygonal2DRegion implements Region {
             }
             if (x1 <= targetX && targetX <= x2) {
                 crossproduct = ((long) targetZ - (long) z1) * (long) (x2 - x1)
-                    - ((long) z2 - (long) z1) * (long) (targetX - x1);
+                        - ((long) z2 - (long) z1) * (long) (targetX - x1);
                 if (crossproduct == 0) {
                     if ((z1 <= targetZ) == (targetZ <= z2)) return true; //on edge
                 } else if (crossproduct < 0 && (x1 != targetX)) {
@@ -341,45 +418,20 @@ public class Polygonal2DRegion implements Region {
 
         return inside;
     }
-    
-    /**
-     * Get a list of chunks.
-     * 
-     * @return
-     */
-    public Set<Vector2D> getChunks() {
-        Set<Vector2D> chunks = new HashSet<Vector2D>();
 
-        Vector min = getMinimumPoint();
-        Vector max = getMaximumPoint();
-
-        for (int x = min.getBlockX(); x <= max.getBlockX(); ++x) {
-            for (int y = min.getBlockY(); y <= max.getBlockY(); ++y) {
-                for (int z = min.getBlockZ(); z <= max.getBlockZ(); ++z) {
-                    Vector pt = new Vector(x, y, z);
-                    if (contains(pt)) { // Not the best
-                        chunks.add(ChunkStore.toChunk(pt));
-                    }
-                }
-            }
-        }
-
-        return chunks;
-    }
-    
     /**
      * Return the number of points.
-     * 
+     *
      * @return
      */
     public int size() {
         return points.size();
     }
-    
+
     /**
      * Expand the height of the polygon to fit the specified Y.
-     * 
-     * @param y 
+     *
+     * @param y
      * @return true if the area was expanded
      */
     public boolean expandY(int y) {
@@ -395,82 +447,37 @@ public class Polygonal2DRegion implements Region {
             maxY = y;
             return true;
         }
-        
+
         return false;
     }
 
     /**
      * Get the iterator.
-     * 
+     *
      * @return iterator of points inside the region
      */
+    @Override
     public Iterator<BlockVector> iterator() {
-        return new Polygonal2DRegionIterator(this);
-        
-        /*
-        Incomplete iterator. Where's my yield?!
-        
-        ArrayList<BlockVector> items = new ArrayList<BlockVector>();
-        
-        int nodes, pixelZ, i, j, swap;
-        int n = points.size();
-        int[] nodeX = new int[n];
+        return new FlatRegion3DIterator(this);
+    }
 
-        int minZ = getMinimumPoint().getBlockZ();
-        int maxZ = getMaximumPoint().getBlockZ();
-        
-        for (pixelZ = minZ; pixelZ < maxZ; ++pixelZ) {
-            // Build a list of nodes
-            nodes = 0;
-            j = n - 1;
-            for (i = 0; i < n; ++i) {
-                if (points.get(i).getBlockZ() < (double) pixelZ
-                        && points.get(j).getBlockZ() >= (double) pixelZ
-                        || points.get(j).getBlockZ() < (double) pixelZ
-                        && points.get(i).getBlockZ() >= (double) pixelZ) {
-                    nodeX[nodes++] = (int) (points.get(i).getBlockX()
-                            + (pixelZ - points.get(i).getBlockZ())
-                            / (points.get(j).getBlockZ() - points.get(i)
-                                    .getBlockZ())
-                            * (points.get(j).getBlockX() - points.get(i)
-                                    .getBlockX()));
-                }
-                j = i;
+    @Override
+    public Iterable<Vector2D> asFlatRegion() {
+        return new Iterable<Vector2D>() {
+            @Override
+            public Iterator<Vector2D> iterator() {
+                return new FlatRegionIterator(Polygonal2DRegion.this);
             }
-
-            // Sort the nodes, via a simple bubble sort
-            i = 0;
-            while (i < nodes - 1) {
-                if (nodeX[i] > nodeX[i + 1]) {
-                    swap = nodeX[i];
-                    nodeX[i] = nodeX[i + 1];
-                    nodeX[i + 1] = swap;
-                    if (i > 0)
-                        --i;
-                } else {
-                    ++i;
-                }
-            }
-
-            // Fill the pixels between node pairs
-            for (i = 0; i < nodes; i += 2) {
-                for (j = nodeX[i]; j < nodeX[i + 1]; ++j) {
-                    for (int y = minY; y >= maxY; ++y) {
-                        items.add(new BlockVector(j, y, pixelZ));
-                    }
-                }
-            }
-        }
-        
-        return items.iterator();*/
+        };
     }
 
     /**
      * Returns string representation in the format
      * "(x1, z1) - ... - (xN, zN) * (minY - maxY)"
-     * 
+     *
      * @return string
      */
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         List<BlockVector2D> pts = getPoints();
@@ -484,86 +491,18 @@ public class Polygonal2DRegion implements Region {
         return sb.toString();
     }
 
-    /**
-     * A terrible polygonal region iterator.
-     */
-    public class Polygonal2DRegionIterator implements Iterator<BlockVector> {
-        protected List<BlockVector2D> points = new ArrayList<BlockVector2D>();
-        protected int minX;
-        protected int minY;
-        protected int minZ;
-        protected int maxX;
-        protected int maxY;
-        protected int maxZ;
-        protected int n;
-        protected int i;
-        protected int curX;
-        protected int curZ;
-        protected int curY;
-        protected BlockVector next;
-        
-        public Polygonal2DRegionIterator(Polygonal2DRegion region) {
-            points = new ArrayList<BlockVector2D>(region.points);
-            Vector min = region.getMinimumPoint();
-            Vector max = region.getMaximumPoint();
-            minX = min.getBlockX();
-            minY = min.getBlockY();
-            minZ = min.getBlockZ();
-            maxX = max.getBlockX();
-            maxY = max.getBlockY();
-            maxZ = max.getBlockZ();
-            n = (maxX - minX + 1) * (maxZ - minZ + 1);
-            i = 0;
-            curX = 0;
-            curZ = 0;
-            curY = minY;
-            next = null;
-            findNext();
-        }
-        
-        private void findNext() {
-            if (i >= n) {
-                next = null;
-                return;
-            }
-            
-            if (next != null && curY <= maxY) {
-                ++curY;
-                next = new BlockVector(curX, curY, curZ);
-                if (curY > maxY) {
-                    ++i;
-                    curY = minY;
-                } else {
-                    return;
-                }
-            } 
-            
-            while (i < n) {
-                curZ = i / (maxX - minX + 1) + minZ;
-                curX = (i % (maxX - minX + 1)) + minX;
-                BlockVector pt = new BlockVector(curX, minY, curZ);
-                if (contains(points, minY, maxY, pt)) {
-                    next = pt;
-                    return;
-                }
-                ++i;
-            }
-            
-            next = null;
+    public Polygonal2DRegion clone() {
+        Polygonal2DRegion clone = (Polygonal2DRegion) super.clone();
+        clone.points = new ArrayList<BlockVector2D>(points);
+        return clone; 
+    }
+
+    @Override
+    public List<BlockVector2D> polygonize(int maxPoints) {
+        if (maxPoints >= 0 && maxPoints < points.size()) {
+            throw new IllegalArgumentException("Cannot polygonize a this Polygonal2DRegion into the amount of points given.");
         }
 
-        public boolean hasNext() {
-            return next != null;
-        }
-
-        public BlockVector next() {
-            BlockVector next = this.next;
-            findNext();
-            return next;
-        }
-
-        public void remove() {
-            throw new UnsupportedOperationException("Not supported");
-        }
+        return points;
     }
 }

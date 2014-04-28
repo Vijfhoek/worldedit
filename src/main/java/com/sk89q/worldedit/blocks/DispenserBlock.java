@@ -1,165 +1,105 @@
-// $Id$
 /*
- * WorldEdit
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldedit.blocks;
 
-import com.sk89q.jnbt.*;
-import com.sk89q.worldedit.data.*;
-import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Map;
+
+import com.sk89q.jnbt.CompoundTag;
+import com.sk89q.jnbt.ListTag;
+import com.sk89q.jnbt.NBTUtils;
+import com.sk89q.jnbt.StringTag;
+import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.world.DataException;
 
 /**
  * Represents dispensers.
  *
  * @author sk89q
  */
-public class DispenserBlock extends BaseBlock implements TileEntityBlock, ContainerBlock {
-    /**
-     * Store the list of items.
-     */
-    private BaseItemStack[] items;
+public class DispenserBlock extends ContainerBlock {
 
     /**
-     * Construct the dispenser block.
+     * Construct an empty dispenser block.
      */
     public DispenserBlock() {
-        super(BlockID.DISPENSER);
-        items = new BaseItemStack[9];
+        super(BlockID.DISPENSER, 9);
     }
 
     /**
-     * Construct the dispenser block.
+     * Construct an empty dispenser block.
      *
-     * @param data
+     * @param data data value (orientation)
      */
     public DispenserBlock(int data) {
-        super(BlockID.DISPENSER, data);
-        items = new BaseItemStack[9];
+        super(BlockID.DISPENSER, data, 9);
     }
 
     /**
-     * Construct the dispenser block.
+     * Construct a dispenser block with the given orientation and inventory.
      *
-     * @param data
-     * @param items
+     * @param data data value (orientation)
+     * @param items array of items in the inventory
      */
     public DispenserBlock(int data, BaseItemStack[] items) {
-        super(BlockID.DISPENSER, data);
-        this.items = items;
+        super(BlockID.DISPENSER, data, 9);
+        this.setItems(items);
     }
 
-    /**
-     * Get the list of items.
-     *
-     * @return
-     */
-    public BaseItemStack[] getItems() {
-        return items;
-    }
-
-    /**
-     * Set the list of items.
-     */
-    public void setItems(BaseItemStack[] items) {
-        this.items = items;
-    }
-
-    /**
-     * Get the tile entity ID.
-     * 
-     * @return
-     */
-    public String getTileEntityID() {
+    @Override
+    public String getNbtId() {
         return "Trap";
     }
 
-    /**
-     * Store additional tile entity data. Returns true if the data is used.
-     *
-     * @return map of values
-     * @throws DataException
-     */
-    public Map<String,Tag> toTileEntityNBT()
-            throws DataException {
-        List<Tag> itemsList = new ArrayList<Tag>();
-        for (int i = 0; i < items.length; ++i) {
-            BaseItemStack item = items[i];
-            if (item != null) {
-                Map<String,Tag> data = new HashMap<String,Tag>();
-                CompoundTag itemTag = new CompoundTag("Items", data);
-                data.put("id", new ShortTag("id", (short)item.getType()));
-                data.put("Damage", new ShortTag("Damage", item.getDamage()));
-                data.put("Count", new ByteTag("Count", (byte)item.getAmount()));
-                data.put("Slot", new ByteTag("Slot", (byte)i));
-                itemsList.add(itemTag);
-            }
-        }
-        Map<String,Tag> values = new HashMap<String,Tag>();
-        values.put("Items", new ListTag("Items", CompoundTag.class, itemsList));
-        return values;
+    @Override
+    public CompoundTag getNbtData() {
+        Map<String, Tag> values = new HashMap<String, Tag>();
+        values.put("Items", new ListTag("Items", CompoundTag.class,
+                serializeInventory(getItems())));
+        return new CompoundTag(getNbtId(), values);
     }
 
-    /**
-     * Get additional information from the title entity data.
-     *
-     * @param values
-     * @throws DataException
-     */
-    public void fromTileEntityNBT(Map<String,Tag> values)
-            throws DataException  {
-        if (values == null) {
+    @Override
+    public void setNbtData(CompoundTag rootTag) throws DataException {
+        if (rootTag == null) {
             return;
         }
-
+        
+        Map<String, Tag> values = rootTag.getValue();
 
         Tag t = values.get("id");
-        if (!(t instanceof StringTag) || !((StringTag)t).getValue().equals("Trap")) {
+        if (!(t instanceof StringTag) || !((StringTag) t).getValue().equals("Trap")) {
             throw new DataException("'Trap' tile entity expected");
         }
 
-        ListTag items = (ListTag)Chunk.getChildTag(values, "Items", ListTag.class);
-        BaseItemStack[] newItems = new BaseItemStack[27];
-
-        for (Tag tag : items.getValue()) {
+        List<CompoundTag> items = new ArrayList<CompoundTag>();
+        for (Tag tag : NBTUtils.getChildTag(values, "Items", ListTag.class).getValue()) {
             if (!(tag instanceof CompoundTag)) {
                 throw new DataException("CompoundTag expected as child tag of Trap Items");
             }
 
-            CompoundTag item = (CompoundTag)tag;
-            Map<String,Tag> itemValues = item.getValue();
-
-            short id = (Short)((ShortTag)Chunk.getChildTag(itemValues, "id", ShortTag.class))
-                    .getValue();
-            short damage = (Short)((ShortTag)Chunk.getChildTag(itemValues, "Damage", ShortTag.class))
-                    .getValue();
-            byte count = (Byte)((ByteTag)Chunk.getChildTag(itemValues, "Count", ByteTag.class))
-                    .getValue();
-            byte slot = (Byte)((ByteTag)Chunk.getChildTag(itemValues, "Slot", ByteTag.class))
-                    .getValue();
-
-            if (slot >= 0 && slot <= 8) {
-                newItems[slot] = new BaseItemStack(id, count, damage);
-            }
+            items.add((CompoundTag) tag);
         }
 
-        this.items = newItems;
+        setItems(deserializeInventory(items));
     }
 }

@@ -1,35 +1,29 @@
-// $Id$
 /*
- * Copyright (c) 2011 toi
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
-*/
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 
 package com.sk89q.worldedit.util;
 
-import com.sk89q.worldedit.BlockWorldVector;
-import com.sk89q.worldedit.LocalPlayer;
-import com.sk89q.worldedit.LocalWorld;
-import com.sk89q.worldedit.Vector;
-import com.sk89q.worldedit.WorldVectorFace;
+import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BlockID;
 import com.sk89q.worldedit.blocks.BlockType;
+import com.sk89q.worldedit.entity.Entity;
+import com.sk89q.worldedit.internal.LocalWorldAdapter;
 
 /**
  * This class uses an inefficient method to figure out what block a player
@@ -55,20 +49,31 @@ public class TargetBlock {
      * @param player player to work with
      */
     public TargetBlock(LocalPlayer player) {
-        this.world = player.getWorld();
+        this.world = LocalWorldAdapter.wrap(player.getWorld());
         this.setValues(player.getPosition(), player.getYaw(), player.getPitch(),
                 300, 1.65, 0.2);
     }
 
     /**
      * Constructor requiring a player, max distance and a checking distance
-     * 
+     *
      * @param player LocalPlayer to work with
      * @param maxDistance how far it checks for blocks
      * @param checkDistance how often to check for blocks, the smaller the more precise
      */
     public TargetBlock(LocalPlayer player, int maxDistance, double checkDistance) {
-        this.world = player.getWorld();
+        this((Entity) player, maxDistance, checkDistance);
+    }
+
+    /**
+     * Constructor requiring a player, max distance and a checking distance
+     *
+     * @param player LocalPlayer to work with
+     * @param maxDistance how far it checks for blocks
+     * @param checkDistance how often to check for blocks, the smaller the more precise
+     */
+    public TargetBlock(Entity player, int maxDistance, double checkDistance) {
+        this.world = LocalWorldAdapter.wrap(player.getWorld());
         this.setValues(player.getPosition(), player.getYaw(), player.getPitch(),
                 maxDistance, 1.65, checkDistance);
     }
@@ -80,7 +85,7 @@ public class TargetBlock {
      * @param xRotation
      * @param yRotation
      * @param maxDistance how far it checks for blocks
-     * @param viewPos where the view is positioned in y-axis
+     * @param viewHeight where the view is positioned in y-axis
      * @param checkDistance how often to check for blocks, the smaller the more precise
      */
     private void setValues(Vector loc, double xRotation, double yRotation,
@@ -92,7 +97,7 @@ public class TargetBlock {
         yRotation = yRotation * -1;
 
         double h = (checkDistance * Math.cos(Math.toRadians(yRotation)));
-        
+
         offset = new Vector((h * Math.cos(Math.toRadians(xRotation))),
                             (checkDistance * Math.sin(Math.toRadians(yRotation))),
                             (h * Math.sin(Math.toRadians(xRotation))));
@@ -113,9 +118,9 @@ public class TargetBlock {
         BlockWorldVector lastBlock = null;
         while (getNextBlock() != null) {
             if (world.getBlockType(getCurrentBlock()) == BlockID.AIR) {
-                if(searchForLastBlock) {
+                if (searchForLastBlock) {
                     lastBlock = getCurrentBlock();
-                    if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= 127) {
+                    if (lastBlock.getBlockY() <= 0 || lastBlock.getBlockY() >= world.getMaxY()) {
                         searchForLastBlock = false;
                     }
                 }
@@ -126,7 +131,7 @@ public class TargetBlock {
         BlockWorldVector currentBlock = getCurrentBlock();
         return (currentBlock != null ? currentBlock : lastBlock);
     }
-    
+
     /**
      * Returns the block at the sight. Returns null if out of range or if no
      * viable target was found
@@ -134,8 +139,7 @@ public class TargetBlock {
      * @return Block
      */
     public BlockWorldVector getTargetBlock() {
-        while ((getNextBlock() != null)
-                && (world.getBlockType(getCurrentBlock()) == 0));
+        while (getNextBlock() != null && world.getBlockType(getCurrentBlock()) == 0) ;
         return getCurrentBlock();
     }
 
@@ -146,8 +150,7 @@ public class TargetBlock {
      * @return Block
      */
     public BlockWorldVector getSolidTargetBlock() {
-        while ((getNextBlock() != null)
-                && BlockType.canPassThrough(world.getBlockType(getCurrentBlock())));
+        while (getNextBlock() != null && BlockType.canPassThrough(world.getBlock(getCurrentBlock()))) ;
         return getCurrentBlock();
     }
 
@@ -160,7 +163,7 @@ public class TargetBlock {
         prevPos = targetPos;
         do {
             curDistance += checkDistance;
-            
+
             targetPosDouble = offset.add(targetPosDouble.getX(),
                                          targetPosDouble.getY(),
                                          targetPosDouble.getZ());
@@ -169,7 +172,7 @@ public class TargetBlock {
                 && targetPos.getBlockX() == prevPos.getBlockX()
                 && targetPos.getBlockY() == prevPos.getBlockY()
                 && targetPos.getBlockZ() == prevPos.getBlockZ());
-        
+
         if (curDistance > maxDistance) {
             return null;
         }

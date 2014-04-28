@@ -1,21 +1,21 @@
-// $Id$
 /*
- * WorldEdit
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldedit.blocks;
 
@@ -35,14 +35,14 @@ public enum ClothColor {
     LIGHT_BLUE(ID.LIGHT_BLUE, "Light blue", "lightblue"),
     YELLOW(ID.YELLOW, "Yellow", "yellow"),
     LIGHT_GREEN(ID.LIGHT_GREEN, "Light green", "lightgreen"),
-    PINK(ID.PINK, "Pink", new String[] {"pink", "lightred"}),
-    GRAY(ID.GRAY, "Gray", new String[] {"grey", "gray"}),
-    LIGHT_GRAY(ID.LIGHT_GRAY, "Light gray", new String[] {"lightgrey", "lightgray"}),
-    CYAN(ID.CYAN, "Cyan", new String[] {"cyan", "turquoise"}),
-    PURPLE(ID.PURPLE, "Purple", new String[] {"purple", "violet"}),
+    PINK(ID.PINK, "Pink", new String[] { "pink", "lightred" }),
+    GRAY(ID.GRAY, "Gray", new String[] { "grey", "gray" }),
+    LIGHT_GRAY(ID.LIGHT_GRAY, "Light gray", new String[] { "lightgrey", "lightgray" }),
+    CYAN(ID.CYAN, "Cyan", new String[] { "cyan", "turquoise" }),
+    PURPLE(ID.PURPLE, "Purple", new String[] { "purple", "violet" }),
     BLUE(ID.BLUE, "Blue", "blue"),
-    BROWN(ID.BROWN, "Brown", new String[] {"brown", "cocoa", "coffee"}),
-    DARK_GREEN(ID.DARK_GREEN, "Dark green", new String[] {"green", "darkgreen", "cactusgreen", "cactigreen"}),
+    BROWN(ID.BROWN, "Brown", new String[] { "brown", "cocoa", "coffee" }),
+    DARK_GREEN(ID.DARK_GREEN, "Dark green", new String[] { "green", "darkgreen", "cactusgreen", "cactigreen" }),
     RED(ID.RED, "Red", "red"),
     BLACK(ID.BLACK, "Black", "black");
 
@@ -68,11 +68,11 @@ public enum ClothColor {
     /**
      * Stores a map of the IDs for fast access.
      */
-    private static final Map<Integer,ClothColor> ids = new HashMap<Integer,ClothColor>();
+    private static final Map<Integer, ClothColor> ids = new HashMap<Integer, ClothColor>();
     /**
      * Stores a map of the names for fast access.
      */
-    private static final Map<String,ClothColor> lookup = new HashMap<String,ClothColor>();
+    private static final Map<String, ClothColor> lookup = new HashMap<String, ClothColor>();
 
     private final int id;
     private final String name;
@@ -97,7 +97,7 @@ public enum ClothColor {
     ClothColor(int id, String name, String lookupKey) {
         this.id = id;
         this.name = name;
-        this.lookupKeys = new String[]{lookupKey};
+        this.lookupKeys = new String[] { lookupKey };
     }
 
     /**

@@ -1,21 +1,21 @@
-// $Id$
 /*
- * WorldEdit
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldedit;
 
@@ -23,7 +23,13 @@ package com.sk89q.worldedit;
  *
  * @author sk89q
  */
-public class Vector {
+public class Vector implements Comparable<Vector> {
+    public static final Vector ZERO = new Vector(0, 0, 0);
+    public static final Vector UNIT_X = new Vector(1, 0, 0);
+    public static final Vector UNIT_Y = new Vector(0, 1, 0);
+    public static final Vector UNIT_Z = new Vector(0, 0, 1);
+    public static final Vector ONE = new Vector(1, 1, 1);
+
     protected final double x, y, z;
 
     /**
@@ -47,9 +53,9 @@ public class Vector {
      * @param z
      */
     public Vector(int x, int y, int z) {
-        this.x = (double)x;
-        this.y = (double)y;
-        this.z = (double)z;
+        this.x = (double) x;
+        this.y = (double) y;
+        this.z = (double) z;
     }
 
     /**
@@ -60,9 +66,9 @@ public class Vector {
      * @param z
      */
     public Vector(float x, float y, float z) {
-        this.x = (double)x;
-        this.y = (double)y;
-        this.z = (double)z;
+        this.x = (double) x;
+        this.y = (double) y;
+        this.z = (double) z;
     }
 
     /**
@@ -96,7 +102,7 @@ public class Vector {
      * @return the x
      */
     public int getBlockX() {
-        return (int)Math.round(x);
+        return (int) Math.round(x);
     }
 
     /**
@@ -130,7 +136,7 @@ public class Vector {
      * @return the y
      */
     public int getBlockY() {
-        return (int)Math.round(y);
+        return (int) Math.round(y);
     }
 
     /**
@@ -164,7 +170,7 @@ public class Vector {
      * @return the z
      */
     public int getBlockZ() {
-        return (int)Math.round(z);
+        return (int) Math.round(z);
     }
 
     /**
@@ -227,7 +233,7 @@ public class Vector {
      * @param others
      * @return New point
      */
-    public Vector add(Vector ... others) {
+    public Vector add(Vector... others) {
         double newX = x, newY = y, newZ = z;
 
         for (int i = 0; i < others.length; ++i) {
@@ -278,7 +284,7 @@ public class Vector {
      * @param others
      * @return New point
      */
-    public Vector subtract(Vector ... others) {
+    public Vector subtract(Vector... others) {
         double newX = x, newY = y, newZ = z;
 
         for (int i = 0; i < others.length; ++i) {
@@ -290,7 +296,7 @@ public class Vector {
     }
 
     /**
-     * Multiplies two points.
+     * Component-wise multiplication
      *
      * @param other
      * @return New point
@@ -300,7 +306,7 @@ public class Vector {
     }
 
     /**
-     * Multiply two points.
+     * Component-wise multiplication
      *
      * @param x
      * @param y
@@ -312,7 +318,7 @@ public class Vector {
     }
 
     /**
-     * Multiply two points.
+     * Component-wise multiplication
      *
      * @param x
      * @param y
@@ -324,12 +330,12 @@ public class Vector {
     }
 
     /**
-     * Multiply points.
+     * Component-wise multiplication
      *
      * @param others
      * @return New point
      */
-    public Vector multiply(Vector ... others) {
+    public Vector multiply(Vector... others) {
         double newX = x, newY = y, newZ = z;
 
         for (int i = 0; i < others.length; ++i) {
@@ -371,7 +377,7 @@ public class Vector {
     }
 
     /**
-     * Divide two points.
+     * Component-wise division
      *
      * @param other
      * @return New point
@@ -381,7 +387,7 @@ public class Vector {
     }
 
     /**
-     * Divide two points.
+     * Component-wise division
      *
      * @param x
      * @param y
@@ -393,7 +399,7 @@ public class Vector {
     }
 
     /**
-     * Divide two points.
+     * Component-wise division
      *
      * @param x
      * @param y
@@ -437,12 +443,19 @@ public class Vector {
     /**
      * Get the length of the vector.
      *
-     * @return distance
+     * @return length
      */
     public double length() {
-        return Math.sqrt(Math.pow(x, 2) +
-                Math.pow(y, 2) +
-                Math.pow(z, 2));
+        return Math.sqrt(x * x + y * y + z * z);
+    }
+
+    /**
+     * Get the length^2 of the vector.
+     *
+     * @return length^2
+     */
+    public double lengthSq() {
+        return x * x + y * y + z * z;
     }
 
     /**
@@ -479,6 +492,30 @@ public class Vector {
     }
 
     /**
+     * Gets the dot product of this and another vector.
+     *
+     * @param other
+     * @return the dot product of this and the other vector
+     */
+    public double dot(Vector other) {
+        return x * other.x + y * other.y + z * other.z;
+    }
+
+    /**
+     * Gets the cross product of this and another vector.
+     *
+     * @param other
+     * @return the cross product of this and the other vector
+     */
+    public Vector cross(Vector other) {
+        return new Vector(
+            y * other.z - z * other.y,
+            z * other.x - x * other.z,
+            x * other.y - y * other.x
+        );
+    }
+
+    /**
      * Checks to see if a vector is contained with another.
      *
      * @param min
@@ -486,9 +523,9 @@ public class Vector {
      * @return
      */
     public boolean containedWithin(Vector min, Vector max) {
-        return x >= min.getX() && x <= max.getX()
-                && y >= min.getY() && y <= max.getY()
-                && z >= min.getZ() && z <= max.getZ();
+        return x >= min.x && x <= max.x
+                && y >= min.y && y <= max.y
+                && z >= min.z && z <= max.z;
     }
 
     /**
@@ -501,7 +538,7 @@ public class Vector {
     public boolean containedWithinBlock(Vector min, Vector max) {
         return getBlockX() >= min.getBlockX() && getBlockX() <= max.getBlockX()
                 && getBlockY() >= min.getBlockY() && getBlockY() <= max.getBlockY()
-                && getBlockZ() >= min.getBlockZ() && getBlockZ() <= max.getBlockY();
+                && getBlockZ() >= min.getBlockZ() && getBlockZ() <= max.getBlockZ();
     }
 
     /**
@@ -516,25 +553,103 @@ public class Vector {
     }
 
     /**
+     * Rounds all components down.
+     *
+     * @return
+     */
+    public Vector floor() {
+        return new Vector(Math.floor(x), Math.floor(y), Math.floor(z));
+    }
+
+    /**
+     * Rounds all components up.
+     *
+     * @return
+     */
+    public Vector ceil() {
+        return new Vector(Math.ceil(x), Math.ceil(y), Math.ceil(z));
+    }
+
+    /**
+     * Rounds all components to the closest integer.<br>
+     *<br>
+     * Components < 0.5 are rounded down, otherwise up
+     *
+     * @return
+     */
+    public Vector round() {
+        return new Vector(Math.floor(x + 0.5), Math.floor(y + 0.5), Math.floor(z + 0.5));
+    }
+
+    /**
+     * Returns a vector with the absolute values of the components of this vector.
+     *
+     * @return
+     */
+    public Vector positive() {
+        return new Vector(Math.abs(x), Math.abs(y), Math.abs(z));
+    }
+
+    /**
      * 2D transformation.
      *
      * @param angle in degrees
-     * @param aboutX
-     * @param aboutZ
-     * @param translateX
-     * @param translateZ
+     * @param aboutX about which x coordinate to rotate
+     * @param aboutZ about which z coordinate to rotate
+     * @param translateX what to add after rotation
+     * @param translateZ what to add after rotation
      * @return
      */
     public Vector transform2D(double angle,
             double aboutX, double aboutZ, double translateX, double translateZ) {
         angle = Math.toRadians(angle);
-        double x = this.x;
-        double z = this.z;
+        double x = this.x - aboutX;
+        double z = this.z - aboutZ;
         double x2 = x * Math.cos(angle) - z * Math.sin(angle);
         double z2 = x * Math.sin(angle) + z * Math.cos(angle);
-        return new Vector(x2 + aboutX + translateX,
-                          y,
-                          z2 + aboutZ + translateZ);
+
+        return new Vector(
+            x2 + aboutX + translateX,
+            y,
+            z2 + aboutZ + translateZ
+        );
+    }
+
+    public boolean isCollinearWith(Vector other) {
+        if (x == 0 && y == 0 && z == 0) {
+            // this is a zero vector
+            return true;
+        }
+
+        final double otherX = other.x;
+        final double otherY = other.y;
+        final double otherZ = other.z;
+
+        if (otherX == 0 && otherY == 0 && otherZ == 0) {
+            // other is a zero vector
+            return true;
+        }
+
+        if ((x == 0) != (otherX == 0)) return false;
+        if ((y == 0) != (otherY == 0)) return false;
+        if ((z == 0) != (otherZ == 0)) return false;
+
+        final double quotientX = otherX / x;
+        if (!Double.isNaN(quotientX)) {
+            return other.equals(multiply(quotientX));
+        }
+
+        final double quotientY = otherY / y;
+        if (!Double.isNaN(quotientY)) {
+            return other.equals(multiply(quotientY));
+        }
+
+        final double quotientZ = otherZ / z;
+        if (!Double.isNaN(quotientZ)) {
+            return other.equals(multiply(quotientZ));
+        }
+
+        throw new RuntimeException("This should not happen");
     }
 
     /**
@@ -545,10 +660,12 @@ public class Vector {
      * @param z
      * @return point
      */
-    public static Vector toBlockPoint(double x, double y, double z) {
-        return new Vector((int)Math.floor(x),
-                         (int)Math.floor(y),
-                         (int)Math.floor(z));
+    public static BlockVector toBlockPoint(double x, double y, double z) {
+        return new BlockVector(
+            Math.floor(x),
+            Math.floor(y),
+            Math.floor(z)
+        );
     }
 
     /**
@@ -557,9 +674,11 @@ public class Vector {
      * @return point
      */
     public BlockVector toBlockPoint() {
-        return new BlockVector((int)Math.floor(x),
-                 (int)Math.floor(y),
-                 (int)Math.floor(z));
+        return new BlockVector(
+            Math.floor(x),
+            Math.floor(y),
+            Math.floor(z)
+        );
     }
 
     /**
@@ -573,9 +692,17 @@ public class Vector {
         if (!(obj instanceof Vector)) {
             return false;
         }
-        Vector other = (Vector) obj;
-        return other.getX() == this.x && other.getY() == this.y && other.getZ() == this.z;
 
+        Vector other = (Vector) obj;
+        return other.x == this.x && other.y == this.y && other.z == this.z;
+    }
+
+    @Override
+    public int compareTo(Vector other) {
+        if (y != other.y) return Double.compare(y, other.y);
+        if (z != other.z) return Double.compare(z, other.z);
+        if (x != other.x) return Double.compare(x, other.x);
+        return 0;
     }
 
     /**
@@ -613,6 +740,15 @@ public class Vector {
     }
 
     /**
+     * Creates a 2D vector by dropping the Y component from this vector.
+     *
+     * @return Vector2D
+     */
+    public Vector2D toVector2D() {
+        return new Vector2D(x, z);
+    }
+
+    /**
      * Gets the minimum components of two vectors.
      *
      * @param v1
@@ -621,9 +757,10 @@ public class Vector {
      */
     public static Vector getMinimum(Vector v1, Vector v2) {
         return new Vector(
-                Math.min(v1.getX(), v2.getX()),
-                Math.min(v1.getY(), v2.getY()),
-                Math.min(v1.getZ(), v2.getZ()));
+            Math.min(v1.x, v2.x),
+            Math.min(v1.y, v2.y),
+            Math.min(v1.z, v2.z)
+        );
     }
 
     /**
@@ -635,8 +772,24 @@ public class Vector {
      */
     public static Vector getMaximum(Vector v1, Vector v2) {
         return new Vector(
-                Math.max(v1.getX(), v2.getX()),
-                Math.max(v1.getY(), v2.getY()),
-                Math.max(v1.getZ(), v2.getZ()));
+            Math.max(v1.x, v2.x),
+            Math.max(v1.y, v2.y),
+            Math.max(v1.z, v2.z)
+        );
+    }
+
+    /**
+     * Gets the midpoint of two vectors.
+     *
+     * @param v1
+     * @param v2
+     * @return maximum
+     */
+    public static Vector getMidpoint(Vector v1, Vector v2) {
+        return new Vector(
+            (v1.x + v2.x) / 2,
+            (v1.y + v2.y) / 2,
+            (v1.z + v2.z) / 2
+        );
     }
 }

@@ -1,21 +1,21 @@
-// $Id$
 /*
- * WorldEdit
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldedit.scripting;
 
@@ -33,8 +33,9 @@ import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.ServerInterface;
 import com.sk89q.worldedit.UnknownItemException;
 import com.sk89q.worldedit.WorldEdit;
+import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
-import com.sk89q.worldedit.commands.InsufficientArgumentsException;
+import com.sk89q.worldedit.command.InsufficientArgumentsException;
 import com.sk89q.worldedit.patterns.Pattern;
 
 /**
@@ -45,14 +46,14 @@ import com.sk89q.worldedit.patterns.Pattern;
 public class CraftScriptContext extends CraftScriptEnvironment {
     private List<EditSession> editSessions = new ArrayList<EditSession>();
     private String[] args;
-    
+
     public CraftScriptContext(WorldEdit controller,
             ServerInterface server, LocalConfiguration config,
             LocalSession session, LocalPlayer player, String[] args) {
         super(controller, server, config, session, player);
         this.args = args;
     }
-    
+
     /**
      * Get an edit session. Every subsequent call returns a new edit session.
      * Usually you only need to use one edit session.
@@ -60,14 +61,14 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @return
      */
     public EditSession remember() {
-        EditSession editSession =
-                new EditSession(player.getWorld(),
-                        session.getBlockChangeLimit(), session.getBlockBag(player));
+        EditSession editSession = controller.getEditSessionFactory()
+                .getEditSession(player.getWorld(),
+                        session.getBlockChangeLimit(), session.getBlockBag(player), player);
         editSession.enableQueue();
         editSessions.add(editSession);
         return editSession;
     }
-    
+
     /**
      * Get the player.
      * 
@@ -76,7 +77,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     public LocalPlayer getPlayer() {
         return player;
     }
-    
+
     /**
      * Get the player's session.
      * 
@@ -85,7 +86,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     public LocalSession getSession() {
         return session;
     }
-    
+
     /**
      * Get the configuration for WorldEdit.
      * 
@@ -94,7 +95,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     public LocalConfiguration getConfiguration() {
         return config;
     }
-    
+
     /**
      * Get a list of edit sessions that have been created.
      * 
@@ -103,7 +104,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     public List<EditSession> getEditSessions() {
         return Collections.unmodifiableList(editSessions);
     }
-    
+
     /**
      * Print a regular message to the user.
      * 
@@ -112,7 +113,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     public void print(String msg) {
         player.print(msg);
     }
-    
+
     /**
      * Print an error message to the user.
      * 
@@ -121,7 +122,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     public void error(String msg) {
         player.printError(msg);
     }
-    
+
     /**
      * Print an raw message to the user.
      * 
@@ -156,7 +157,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @throws DisallowedItemException
      */
     public BaseBlock getBlock(String arg, boolean allAllowed)
-            throws UnknownItemException, DisallowedItemException {
+            throws WorldEditException {
         return controller.getBlock(player, arg, allAllowed);
     }
 
@@ -169,10 +170,10 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @throws DisallowedItemException
      */
     public BaseBlock getBlock(String id)
-            throws UnknownItemException, DisallowedItemException {
+            throws WorldEditException {
         return controller.getBlock(player, id, false);
     }
-    
+
     /**
      * Get a list of blocks as a set. This returns a Pattern.
      *
@@ -182,7 +183,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @throws DisallowedItemException 
      */
     public Pattern getBlockPattern(String list)
-            throws UnknownItemException, DisallowedItemException {
+            throws WorldEditException {
         return controller.getBlockPattern(player, list);
     }
 
@@ -196,10 +197,10 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @throws DisallowedItemException 
      */
     public Set<Integer> getBlockIDs(String list, boolean allBlocksAllowed)
-            throws UnknownItemException, DisallowedItemException {
+            throws WorldEditException {
         return controller.getBlockIDs(player, list, allBlocksAllowed);
     }
-    
+
     /**
      * Gets the path to a file. This method will check to see if the filename
      * has valid characters and has an extension. It also prevents directory
@@ -216,9 +217,9 @@ public class CraftScriptContext extends CraftScriptEnvironment {
     @Deprecated
     public File getSafeFile(String folder, String filename) throws FilenameException {
         File dir = controller.getWorkingDirectoryFile(folder);
-        return controller.getSafeOpenFile(player, dir, filename, null, null);
+        return controller.getSafeOpenFile(player, dir, filename, null, (String[]) null);
     }
-    
+
     /**
      * Gets the path to a file for opening. This method will check to see if the
      * filename has valid characters and has an extension. It also prevents
@@ -236,12 +237,12 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @throws FilenameException 
      */
     public File getSafeOpenFile(String folder, String filename,
-            String defaultExt, String[] exts)
+            String defaultExt, String... exts)
             throws FilenameException {
         File dir = controller.getWorkingDirectoryFile(folder);
         return controller.getSafeOpenFile(player, dir, filename, defaultExt, exts);
     }
-    
+
     /**
      * Gets the path to a file for saving. This method will check to see if the
      * filename has valid characters and has an extension. It also prevents
@@ -259,7 +260,7 @@ public class CraftScriptContext extends CraftScriptEnvironment {
      * @throws FilenameException 
      */
     public File getSafeSaveFile(String folder, String filename,
-            String defaultExt, String[] exts)
+            String defaultExt, String... exts)
             throws FilenameException {
         File dir = controller.getWorkingDirectoryFile(folder);
         return controller.getSafeSaveFile(player, dir, filename, defaultExt, exts);

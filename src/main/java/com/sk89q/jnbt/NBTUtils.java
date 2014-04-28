@@ -1,63 +1,39 @@
+/*
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.sk89q.jnbt;
 
-import com.sk89q.jnbt.ByteArrayTag;
-import com.sk89q.jnbt.ByteTag;
-import com.sk89q.jnbt.CompoundTag;
-import com.sk89q.jnbt.DoubleTag;
-import com.sk89q.jnbt.EndTag;
-import com.sk89q.jnbt.FloatTag;
-import com.sk89q.jnbt.IntTag;
-import com.sk89q.jnbt.ListTag;
-import com.sk89q.jnbt.LongTag;
-import com.sk89q.jnbt.NBTConstants;
-import com.sk89q.jnbt.ShortTag;
-import com.sk89q.jnbt.StringTag;
-import com.sk89q.jnbt.Tag;
+import com.sk89q.worldedit.world.storage.InvalidFormatException;
 
-/*
- * JNBT License
- * 
- * Copyright (c) 2010 Graham Edgecombe
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- * 
- *     * Redistributions of source code must retain the above copyright notice,
- *       this list of conditions and the following disclaimer.
- *       
- *     * Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
- *       
- *     * Neither the name of the JNBT team nor the names of its
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE. 
- */
+import java.util.Map;
 
 /**
  * A class which contains NBT-related utility methods.
- * 
+ *
  * @author Graham Edgecombe
- * 
+ *
  */
 public final class NBTUtils {
 
     /**
      * Gets the type name of a tag.
-     * 
+     *
      * @param clazz
      *            The tag class.
      * @return The type name.
@@ -85,6 +61,8 @@ public final class NBTUtils {
             return "TAG_Short";
         } else if (clazz.equals(StringTag.class)) {
             return "TAG_String";
+        } else if (clazz.equals(IntArrayTag.class)) {
+            return "TAG_Int_Array";
         } else {
             throw new IllegalArgumentException("Invalid tag classs ("
                     + clazz.getName() + ").");
@@ -93,7 +71,7 @@ public final class NBTUtils {
 
     /**
      * Gets the type code of a tag class.
-     * 
+     *
      * @param clazz
      *            The tag class.
      * @return The type code.
@@ -123,6 +101,8 @@ public final class NBTUtils {
             return NBTConstants.TYPE_SHORT;
         } else if (clazz.equals(StringTag.class)) {
             return NBTConstants.TYPE_STRING;
+        } else if (clazz.equals(IntArrayTag.class)) {
+            return NBTConstants.TYPE_INT_ARRAY;
         } else {
             throw new IllegalArgumentException("Invalid tag classs ("
                     + clazz.getName() + ").");
@@ -131,7 +111,7 @@ public final class NBTUtils {
 
     /**
      * Gets the class of a type of tag.
-     * 
+     *
      * @param type
      *            The type.
      * @return The class.
@@ -162,6 +142,8 @@ public final class NBTUtils {
             return ListTag.class;
         case NBTConstants.TYPE_COMPOUND:
             return CompoundTag.class;
+        case NBTConstants.TYPE_INT_ARRAY:
+            return IntArrayTag.class;
         default:
             throw new IllegalArgumentException("Invalid tag type : " + type
                     + ".");
@@ -173,6 +155,27 @@ public final class NBTUtils {
      */
     private NBTUtils() {
 
+    }
+
+    /**
+     * Get child tag of a NBT structure.
+     *
+     * @param items
+     * @param key
+     * @param expected
+     * @return child tag
+     * @throws InvalidFormatException
+     */
+    public static <T extends Tag> T getChildTag(Map<String,Tag> items, String key,
+                                                Class<T> expected) throws InvalidFormatException {
+        if (!items.containsKey(key)) {
+            throw new InvalidFormatException("Missing a \"" + key + "\" tag");
+        }
+        Tag tag = items.get(key);
+        if (!expected.isInstance(tag)) {
+            throw new InvalidFormatException(key + " tag is not of tag type " + expected.getName());
+        }
+        return expected.cast(tag);
     }
 
 }

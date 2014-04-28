@@ -1,36 +1,46 @@
-// $Id$
 /*
- * WorldEdit
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// $Id$
+
 package com.sk89q.worldedit.util;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+
 import com.sk89q.util.StringUtil;
 import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
-import com.sk89q.worldedit.snapshots.SnapshotRepository;
+import com.sk89q.worldedit.world.snapshot.SnapshotRepository;
 
 /**
  * Simple LocalConfiguration that loads settings using
  * <code>java.util.Properties</code>.
- * 
+ *
  * @author sk89q
  */
 public class PropertiesConfiguration extends LocalConfiguration {
@@ -40,7 +50,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
 
     /**
      * Construct the object. The configuration isn't loaded yet.
-     * 
+     *
      * @param path
      */
     public PropertiesConfiguration(File path) {
@@ -74,11 +84,16 @@ public class PropertiesConfiguration extends LocalConfiguration {
         disallowedBlocks = getIntSet("disallowed-blocks", defaultDisallowedBlocks);
         defaultChangeLimit = getInt("default-max-changed-blocks", defaultChangeLimit);
         maxChangeLimit = getInt("max-changed-blocks", maxChangeLimit);
+        defaultMaxPolygonalPoints = getInt("default-max-polygon-points", defaultMaxPolygonalPoints);
+        maxPolygonalPoints = getInt("max-polygon-points", maxPolygonalPoints);
+        defaultMaxPolyhedronPoints = getInt("default-max-polyhedron-points", defaultMaxPolyhedronPoints);
+        maxPolyhedronPoints = getInt("max-polyhedron-points", maxPolyhedronPoints);
         shellSaveType = getString("shell-save-type", shellSaveType);
         maxRadius = getInt("max-radius", maxRadius);
         maxSuperPickaxeSize = getInt("max-super-pickaxe-size", maxSuperPickaxeSize);
         maxBrushRadius = getInt("max-brush-radius", maxBrushRadius);
         logCommands = getBool("log-commands", logCommands);
+        logFile = getString("log-file", logFile);
         registerHelp = getBool("register-help", registerHelp);
         wandItem = getInt("wand-item", wandItem);
         superPickaxeDrop = getBool("super-pickaxe-drop-items", superPickaxeDrop);
@@ -86,14 +101,21 @@ public class PropertiesConfiguration extends LocalConfiguration {
         noDoubleSlash = getBool("no-double-slash", noDoubleSlash);
         useInventory = getBool("use-inventory", useInventory);
         useInventoryOverride = getBool("use-inventory-override", useInventoryOverride);
+        useInventoryCreativeOverride = getBool("use-inventory-creative-override", useInventoryCreativeOverride);
         navigationWand = getInt("nav-wand-item", navigationWand);
         navigationWandMaxDistance = getInt("nav-wand-distance", navigationWandMaxDistance);
+        navigationUseGlass = getBool("nav-use-glass", navigationUseGlass);
         scriptTimeout = getInt("scripting-timeout", scriptTimeout);
+        saveDir = getString("schematic-save-dir", saveDir);
+        scriptsDir = getString("craftscript-dir", scriptsDir);
+        butcherDefaultRadius = getInt("butcher-default-radius", butcherDefaultRadius);
+        butcherMaxRadius = getInt("butcher-max-radius", butcherMaxRadius);
+        allowSymlinks = getBool("allow-symbolic-links", allowSymlinks);
 
         LocalSession.MAX_HISTORY_SIZE = Math.max(15, getInt("history-size", 15));
 
         String snapshotsDir = getString("snapshots-dir", "");
-        if (!snapshotsDir.isEmpty()) {
+        if (snapshotsDir.length() > 0) {
             snapshotRepo = new SnapshotRepository(snapshotsDir);
         }
 
@@ -118,7 +140,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
 
     /**
      * Get a string value.
-     * 
+     *
      * @param key
      * @param def
      * @return
@@ -138,7 +160,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
 
     /**
      * Get a boolean value.
-     * 
+     *
      * @param key
      * @param def
      * @return
@@ -156,7 +178,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
 
     /**
      * Get an integer value.
-     * 
+     *
      * @param key
      * @param def
      * @return
@@ -178,7 +200,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
 
     /**
      * Get a double value.
-     * 
+     *
      * @param key
      * @param def
      * @return
@@ -200,7 +222,7 @@ public class PropertiesConfiguration extends LocalConfiguration {
 
     /**
      * Get a double value.
-     * 
+     *
      * @param key
      * @param def
      * @return

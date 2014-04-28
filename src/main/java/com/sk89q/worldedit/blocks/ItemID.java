@@ -1,27 +1,27 @@
-// $Id$
 /*
- * WorldEdit
- * Copyright (C) 2010 sk89q <http://www.sk89q.com>
+ * WorldEdit, a Minecraft world manipulation toolkit
+ * Copyright (C) sk89q <http://www.sk89q.com>
+ * Copyright (C) WorldEdit team and contributors
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
+ * for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldedit.blocks;
 
 /**
  * List of item IDs.
- * 
+ *
  * @author sk89q
  */
 public final class ItemID {
@@ -138,6 +138,68 @@ public final class ItemID {
     public static final int COOKED_CHICKEN = 366;
     public static final int ROTTEN_FLESH = 367;
     public static final int ENDER_PEARL = 368;
-    public static final int GOLD_RECORD = 2256;
-    public static final int GREEN_RECORD = 2257;
+    public static final int BLAZE_ROD = 369;
+    public static final int GHAST_TEAR = 370;
+    public static final int GOLD_NUGGET = 371;
+    public static final int NETHER_WART_SEED = 372;
+    public static final int POTION = 373;
+    public static final int GLASS_BOTTLE = 374;
+    public static final int SPIDER_EYE = 375;
+    public static final int FERMENTED_SPIDER_EYE = 376;
+    public static final int BLAZE_POWDER = 377;
+    public static final int MAGMA_CREAM = 378;
+    public static final int BREWING_STAND = 379;
+    public static final int CAULDRON = 380;
+    public static final int EYE_OF_ENDER = 381;
+    public static final int GLISTERING_MELON = 382;
+    public static final int SPAWN_EGG = 383;
+    public static final int BOTTLE_O_ENCHANTING = 384;
+    public static final int FIRE_CHARGE = 385;
+    public static final int BOOK_AND_QUILL = 386;
+    public static final int WRITTEN_BOOK = 387;
+    public static final int EMERALD = 388;
+    public static final int ITEM_FRAME = 389;
+    public static final int FLOWER_POT = 390;
+    public static final int CARROT = 391;
+    public static final int POTATO = 392;
+    public static final int BAKED_POTATO = 393;
+    public static final int POISONOUS_POTATO = 394;
+    public static final int BLANK_MAP = 395;
+    public static final int GOLDEN_CARROT = 396;
+    public static final int HEAD = 397;
+    public static final int CARROT_ON_A_STICK = 398;
+    public static final int NETHER_STAR = 399;
+    public static final int PUMPKIN_PIE = 400;
+    public static final int FIREWORK_ROCKET = 401;
+    public static final int FIREWORK_STAR = 402;
+    public static final int ENCHANTED_BOOK = 403;
+    public static final int COMPARATOR = 404;
+    public static final int NETHER_BRICK = 405;
+    public static final int NETHER_QUARTZ = 406;
+    public static final int TNT_MINECART = 407;
+    public static final int HOPPER_MINECART = 408;
+    public static final int HORSE_ARMOR_IRON = 417;
+    public static final int HORSE_ARMOR_GOLD = 418;
+    public static final int HORSE_ARMOR_DIAMOND = 419;
+    public static final int LEAD = 420;
+    public static final int NAME_TAG = 421;
+    public static final int COMMAND_BLOCK_MINECART = 422;
+
+    @Deprecated public static final int GOLD_RECORD = 2256; // deprecated, but leave it there
+    @Deprecated public static final int GREEN_RECORD = 2257; // deprecated, but leave it there
+    public static final int DISC_13 = 2256;
+    public static final int DISC_CAT = 2257;
+    public static final int DISC_BLOCKS = 2258;
+    public static final int DISC_CHIRP = 2259;
+    public static final int DISC_FAR = 2260;
+    public static final int DISC_MALL = 2261;
+    public static final int DISC_MELLOHI = 2262;
+    public static final int DISC_STAL = 2263;
+    public static final int DISC_STRAD = 2264;
+    public static final int DISC_WARD = 2265;
+    public static final int DISC_11 = 2266;
+    public static final int DISC_WAIT = 2267;
+
+    private ItemID() {
+    }
 }
